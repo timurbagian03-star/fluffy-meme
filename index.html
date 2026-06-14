@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PAPI KOSTICK FINAL HOSTING</title>
+
+<style>
+body{
+    margin:0;
+    font-family:Arial;
+    background:#e5e5e5;
+}
+.container{
+    max-width:750px;
+    margin:auto;
+    background:#fff;
+    min-height:100vh;
+}
+.header{
+    background:#27348b;
+    color:white;
+    padding:15px;
+    font-size:18px;
+    font-weight:bold;
+}
+.box{padding:20px;}
+.soal{
+    margin-bottom:15px;
+    padding:15px;
+    border:1px solid #ddd;
+    border-radius:10px;
+}
+
+/* RADIO STYLE */
+.pilihan{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    margin:10px 0;
+    cursor:pointer;
+    padding:10px;
+    border:1px solid #eee;
+    border-radius:10px;
+    transition:0.2s;
+}
+
+.pilihan:hover{
+    background:#f5f6ff;
+    border-color:#27348b;
+}
+
+.pilihan input[type="radio"]{
+    display:none;
+}
+
+.custom-radio{
+    width:20px;
+    height:20px;
+    border:2px solid #27348b;
+    border-radius:50%;
+    display:inline-block;
+    position:relative;
+    flex-shrink:0;
+}
+
+.pilihan input[type="radio"]:checked + .custom-radio{
+    background:#27348b;
+}
+
+.pilihan input[type="radio"]:checked + .custom-radio::after{
+    content:"";
+    width:8px;
+    height:8px;
+    background:white;
+    border-radius:50%;
+    position:absolute;
+    top:50%;
+    left:50%;
+    transform:translate(-50%,-50%);
+}
+
+button{
+    padding:10px 15px;
+    border:none;
+    background:#27348b;
+    color:white;
+    border-radius:8px;
+    cursor:pointer;
+    margin:5px;
+}
+
+input{
+    padding:10px;
+    width:100%;
+    margin-bottom:10px;
+}
+
+.hidden{display:none;}
+
+.timer{
+    font-size:18px;
+    font-weight:bold;
+    color:red;
+    margin-bottom:10px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<div class="header">PAPI KOSTICK FINAL (READY HOSTING)</div>
+
+<!-- LOGIN -->
+<div id="loginBox" class="box">
+    <h3>Login</h3>
+    <input id="username" placeholder="Masukkan nama kamu">
+    <button onclick="login()">Masuk</button>
+</div>
+
+<!-- INTRO -->
+<div id="introBox" class="box hidden">
+    <h2>TES PAPI KOSTICK</h2>
+    <p><b>Buatan Van</b></p>
+    <p>Durasi: 20 menit</p>
+    <button onclick="startTest()">Mulai Tes</button>
+</div>
+
+<!-- TEST -->
+<div id="testBox" class="box hidden">
+    <h3 id="welcome"></h3>
+    <div class="timer">Sisa waktu: <span id="time">20:00</span></div>
+    <div id="soalContainer"></div>
+
+    <button onclick="prev()">Kembali</button>
+    <button onclick="next()">Lanjut</button>
+    <button onclick="finish()">Selesai</button>
+</div>
+
+<!-- RESULT -->
+<div id="resultBox" class="box hidden"></div>
+
+</div>
+
+<script>
+
+// ================= 89 SOAL =================
+const soal = [
+{a:"Saya seorang pekerja keras", b:"Saya bukan seorang pemurung"},
+{a:"Saya suka bekerja lebih baik dari orang lain", b:"Saya suka menyelesaikan sampai selesai"},
+{a:"Saya suka menunjukkan cara bekerja", b:"Saya ingin bekerja sebaik mungkin"},
+{a:"Saya suka berkelakar", b:"Saya suka memberi arahan"},
+{a:"Saya suka kelompok", b:"Saya suka diperhatikan"},
+
+{a:"Saya senang bersahabat intim", b:"Saya senang kelompok"},
+{a:"Saya cepat berubah", b:"Saya dekat dengan teman"},
+{a:"Saya membalas bila disakiti", b:"Saya suka hal baru"},
+{a:"Saya ingin atasan suka", b:"Saya mengoreksi orang"},
+{a:"Saya mengikuti perintah", b:"Saya ingin menyenangkan atasan"},
+
+{a:"Saya mencoba sekuat tenaga", b:"Saya tertib"},
+{a:"Saya mengatur orang lain", b:"Saya tidak cepat gusar"},
+{a:"Saya memimpin kelompok", b:"Saya tekun sampai selesai"},
+{a:"Saya ingin menarik", b:"Saya ingin sukses"},
+{a:"Saya ikut kelompok", b:"Saya membantu orang lain"},
+
+{a:"Saya cemas tidak disukai", b:"Saya senang diperhatikan"},
+{a:"Saya mencoba hal baru", b:"Saya kerja bersama orang"},
+{a:"Saya menyalahkan orang lain", b:"Saya cemas tidak disukai"},
+{a:"Saya menyenangkan atasan", b:"Saya mencoba hal baru"},
+{a:"Saya butuh petunjuk detail", b:"Saya menegur orang lain"},
+
+{a:"Saya bekerja keras", b:"Saya teliti"},
+{a:"Saya pemimpin", b:"Saya teratur"},
+{a:"Saya mudah gusar", b:"Saya lambat ambil keputusan"},
+{a:"Saya multitasking", b:"Saya diam di kelompok"},
+{a:"Saya senang diundang", b:"Saya ingin unggul"},
+
+{a:"Saya dekat dengan teman", b:"Saya memberi nasihat"},
+{a:"Saya suka hal baru", b:"Saya cerita sukses"},
+{a:"Saya mempertahankan pendapat", b:"Saya ikut kelompok"},
+{a:"Saya tidak mau beda", b:"Saya dekat dengan orang"},
+{a:"Saya butuh arahan", b:"Saya cepat bosan"},
+
+{a:"Saya bekerja keras", b:"Saya berencana"},
+{a:"Saya memimpin", b:"Saya detail"},
+{a:"Saya cepat ambil keputusan", b:"Saya rapi"},
+{a:"Saya cepat kerja", b:"Saya stabil emosi"},
+{a:"Saya ikut kelompok", b:"Saya fokus satu tugas"},
+
+{a:"Saya dekat teman", b:"Saya jadi terbaik"},
+{a:"Saya suka mode baru", b:"Saya tanggung jawab"},
+{a:"Saya suka debat", b:"Saya ingin diperhatikan"},
+{a:"Saya menyenangkan atasan", b:"Saya ikut kelompok"},
+{a:"Saya taat aturan", b:"Saya ingin dikenal"},
+
+{a:"Saya bekerja keras", b:"Saya menyenangkan"},
+{a:"Saya pemimpin", b:"Saya berpikir detail"},
+{a:"Saya ambil peluang", b:"Saya detail"},
+{a:"Saya cepat", b:"Saya rapi"},
+{a:"Saya suka olahraga", b:"Saya menyenangkan"},
+
+{a:"Saya dekat teman", b:"Saya menyelesaikan tugas"},
+{a:"Saya suka eksperimen", b:"Saya kerja sulit"},
+{a:"Saya ingin adil", b:"Saya mengajari orang"},
+{a:"Saya ikut aturan", b:"Saya suka perhatian"},
+{a:"Saya butuh petunjuk", b:"Saya sosial"},
+
+{a:"Saya bekerja keras", b:"Saya tidak lelah"},
+{a:"Saya pemimpin", b:"Saya mudah berteman"},
+{a:"Saya memanfaatkan peluang", b:"Saya banyak berpikir"},
+{a:"Saya cepat kerja", b:"Saya detail"},
+{a:"Saya energi olahraga", b:"Saya rapi"},
+
+{a:"Saya bergaul baik", b:"Saya kontrol diri"},
+{a:"Saya orang baru", b:"Saya menyelesaikan pekerjaan"},
+{a:"Saya bersikeras", b:"Saya kerja keras"},
+{a:"Saya suka saran", b:"Saya mengatur orang"},
+{a:"Saya dipengaruhi orang", b:"Saya suka perhatian"},
+
+{a:"Saya kerja keras", b:"Saya kerja cepat"},
+{a:"Saya didengar", b:"Saya terampil alat"},
+{a:"Saya lambat teman", b:"Saya lambat keputusan"},
+{a:"Saya makan cepat", b:"Saya suka membaca"},
+{a:"Saya berkeliling", b:"Saya teliti"},
+
+{a:"Saya berteman banyak", b:"Saya menemukan barang"},
+{a:"Saya rencana masa depan", b:"Saya menyenangkan"},
+{a:"Saya bangga nama baik", b:"Saya tekun masalah"},
+{a:"Saya menyenangkan orang", b:"Saya ingin sukses"},
+{a:"Saya ikut keputusan", b:"Saya ambil keputusan"},
+
+// 71–89
+{a:"Kelompok saya mengerjakan hal yang saya inginkan", b:"Saya tergesa-gesa"},
+{a:"Saya sering merasa lelah", b:"Saya lambat mengambil keputusan"},
+{a:"Saya bekerja cepat", b:"Saya mudah mendapat kawan"},
+{a:"Saya bersemangat", b:"Saya banyak berpikir"},
+{a:"Saya hangat kepada orang", b:"Saya suka ketelitian"},
+{a:"Saya banyak merencanakan", b:"Saya rapi"},
+{a:"Saya tekun detail", b:"Saya tidak cepat marah"},
+{a:"Saya mengikuti orang yang saya kagumi", b:"Saya menyelesaikan pekerjaan"},
+{a:"Saya suka petunjuk jelas", b:"Saya bekerja keras"},
+{a:"Saya mengejar keinginan", b:"Saya pemimpin yang baik"}
+];
+
+// ===== SYSTEM =====
+let user="";
+let page=0;
+let jawaban=new Array(soal.length).fill(null);
+let timer=1200;
+let interval;
+
+// LOGIN
+function login(){
+    let name=document.getElementById("username").value;
+    if(!name) return alert("Isi nama dulu!");
+    user=name;
+
+    document.getElementById("loginBox").classList.add("hidden");
+    document.getElementById("introBox").classList.remove("hidden");
+}
+
+// START
+function startTest(){
+    document.getElementById("introBox").classList.add("hidden");
+    document.getElementById("testBox").classList.remove("hidden");
+
+    document.getElementById("welcome").innerText="Halo, "+user;
+
+    render();
+    startTimer();
+}
+
+// TIMER
+function startTimer(){
+    interval=setInterval(()=>{
+        timer--;
+        let m=Math.floor(timer/60);
+        let s=timer%60;
+        document.getElementById("time").innerText=m+":"+(s<10?"0":"")+s;
+
+        if(timer<=0) finish();
+    },1000);
+}
+
+// RENDER
+function render(){
+    let html="";
+    let start=page*5;
+    let end=start+5;
+
+    for(let i=start;i<end && i<soal.length;i++){
+        html+=`
+        <div class="soal">
+        <b>${i+1}</b><br>
+
+        <label class="pilihan">
+            <input type="radio" name="s${i}" value="A" ${jawaban[i]==="A"?"checked":""}>
+            <span class="custom-radio"></span>
+            <span><b>A.</b> ${soal[i].a}</span>
+        </label>
+
+        <label class="pilihan">
+            <input type="radio" name="s${i}" value="B" ${jawaban[i]==="B"?"checked":""}>
+            <span class="custom-radio"></span>
+            <span><b>B.</b> ${soal[i].b}</span>
+        </label>
+
+        </div>`;
+    }
+
+    document.getElementById("soalContainer").innerHTML=html;
+
+    document.querySelectorAll("input[type=radio]").forEach(e=>{
+        e.onchange=function(){
+            let i=parseInt(this.name.replace("s",""));
+            jawaban[i]=this.value;
+        }
+    });
+}
+
+// NAV
+function next(){if((page+1)*5<soal.length){page++;render();}}
+function prev(){if(page>0){page--;render();}}
+
+// FINISH
+function finish(){
+    clearInterval(interval);
+
+    let A=0,B=0,empty=0;
+
+    for(let i=0;i<soal.length;i++){
+        if(jawaban[i]==="A") A++;
+        else if(jawaban[i]==="B") B++;
+        else empty++;
+    }
+
+    document.getElementById("testBox").classList.add("hidden");
+    document.getElementById("resultBox").classList.remove("hidden");
+
+    document.getElementById("resultBox").innerHTML=`
+        <h2>Hasil</h2>
+        <p>Nama: ${user}</p>
+        <p>A: ${A}</p>
+        <p>B: ${B}</p>
+        <p>Kosong: ${empty}</p>
+        <p><b>Kesimpulan:</b> ${A>B?"Aktif & dominan":"Tenang & analitis"}</p>
+        <p><i>Buatan Van</i></p>
+        <button onclick="location.reload()">Logout</button>
+    `;
+}
+
+</script>
+
+</body>
+</html>
